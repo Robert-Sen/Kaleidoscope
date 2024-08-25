@@ -1,4 +1,6 @@
 .cache
 .idea
+.vscode
 build
 CMakeFiles
+cmake-build-debug

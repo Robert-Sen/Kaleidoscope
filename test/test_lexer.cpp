@@ -26,8 +26,7 @@ int main() {
                 << '\n';
       break;
     case TOK_NUMBER:
-      std::cout << "TOK_NUMBER: " << lexer.get_tok_value<double>()
-                << '\n';
+      std::cout << "TOK_NUMBER: " << lexer.get_tok_value<double>() << '\n';
       break;
     default:
       std::cerr << "Unknown token\n";

@@ -8,18 +8,18 @@
 int Lexer::get_next_tok() {
   static int last_char = ' ';
 
-  while (std::isspace(last_char)) {
+  while (std::isspace(last_char) || last_char == '\n') {
     last_char = std::getchar();
   }
 
   // Identifier
   if (last_char == '_' || std::isalpha(last_char)) {
-    this->identifier_str_ = last_char;
-    while (last_char == '_' || std::isalpha(last_char) ||
-           std::isdigit(last_char)) {
-      last_char = std::getchar();
+    this->identifier_str_.clear();
+    do {
       this->identifier_str_.push_back(last_char);
-    }
+      last_char = std::getchar();
+    } while (last_char == '_' || std::isalpha(last_char) ||
+             std::isdigit(last_char));
 
     if (this->identifier_str_ == "def") {
       return this->cur_tok_ = TOK_DEF;
@@ -62,7 +62,7 @@ int Lexer::get_next_tok() {
   // Unknown token, just return the charactor as its ascii value
   int this_char = last_char;
   last_char = std::getchar();
-  return this_char;
+  return this->cur_tok_ = this_char;
 }
 
 template <> std::string_view Lexer::get_tok_value<std::string_view>() {
@@ -70,3 +70,13 @@ template <> std::string_view Lexer::get_tok_value<std::string_view>() {
 }
 
 template <> double Lexer::get_tok_value<double>() { return this->number_val_; }
+
+void Lexer::add_op(char op, int prec) { this->op_precedence_[op] = prec; }
+
+int Lexer::get_op_prec(char op) {
+  auto res = this->op_precedence_.find(op);
+  if (res == this->op_precedence_.end()) {
+    return -1;
+  }
+  return res->second;
+}

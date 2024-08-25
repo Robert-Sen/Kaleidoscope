@@ -1,6 +1,7 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+#include <map>
 #include <string>
 
 enum TokenType {
@@ -26,13 +27,19 @@ class Lexer {
 
   int cur_tok_;
 
+  std::map<char, int> op_precedence_;
+
 public:
+
   Lexer() = default;
   ~Lexer() = default;
 
   int get_next_tok();
   inline int get_cur_tok() { return cur_tok_; };
   template <typename T> T get_tok_value();
+
+  void add_op(char op, int prec);
+  int get_op_prec(char op);
 };
 
 #endif // LEXER_H

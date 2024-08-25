@@ -11,11 +11,13 @@ include_directories(
 # Build main
 ###########################################################
 
-set(SRC main.cpp
+set(SRC
+    src/error.cpp
     src/lexer.cpp
+    src/parser.cpp
 )
 
-add_executable(${PROJECT_NAME} ${SRC})
+add_executable(${PROJECT_NAME} main.cpp ${SRC})
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC "include")
@@ -23,4 +25,10 @@ target_include_directories(${PROJECT_NAME}
 ###########################################################
 # Build tests
 ###########################################################
-add_executable(test_lexer test/test_lexer.cpp src/lexer.cpp)
+
+set(test_depends
+    ${SRC}
+)
+
+add_executable(test_lexer test/test_lexer.cpp ${test_depends})
+#add_executable(test_parser test/test_parser.cpp ${test_depends})
