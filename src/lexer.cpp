@@ -59,7 +59,7 @@ int Lexer::get_next_tok() {
     return this->cur_tok_ = TOK_EOF;
   }
 
-  // Unknown token, just return the charactor as its ascii value
+  // Unknown token, just return the character as its ascii value
   int this_char = last_char;
   last_char = std::getchar();
   return this->cur_tok_ = this_char;

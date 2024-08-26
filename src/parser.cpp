@@ -105,7 +105,7 @@ std::unique_ptr<ExprAST> Parser::parse_expression() {
 }
 
 // The prec indicates the min precedence that the binary operators own in the
-// rhs expression, to proceed PraseBinopRHS()
+// rhs expression, to proceed parse_binop_rhs()
 std::unique_ptr<ExprAST> Parser::parse_binop_rhs(int prec,
                                                  std::unique_ptr<ExprAST> lhs) {
 
@@ -154,6 +154,7 @@ std::unique_ptr<PrototypeAST> Parser::parse_prototype() {
 
   std::string fn_name(this->lexer_.get_tok_value<std::string_view>());
 
+  this->lexer_.get_next_tok(); // eat `fn_name
   if (this->lexer_.get_cur_tok() != '(') {
     return log_error_proto("expected '(' in prototype");
   }
@@ -185,7 +186,7 @@ std::unique_ptr<FunctionAST> Parser::parse_definition() {
 }
 
 std::unique_ptr<PrototypeAST> Parser::parse_extern() {
-  this->lexer_.get_next_tok();  // eat `extern
+  this->lexer_.get_next_tok(); // eat `extern
   return this->parse_prototype();
 }
 

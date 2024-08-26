@@ -8,6 +8,7 @@
 #include <string>
 
 class Parser {
+public:
   Lexer lexer_;
 
 public:

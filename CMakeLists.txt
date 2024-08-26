@@ -31,4 +31,4 @@ set(test_depends
 )
 
 add_executable(test_lexer test/test_lexer.cpp ${test_depends})
-#add_executable(test_parser test/test_parser.cpp ${test_depends})
+add_executable(test_parser test/test_parser.cpp ${test_depends})

@@ -9,5 +9,6 @@ std::unique_ptr<ExprAST> log_error(const char *str) {
 }
 
 std::unique_ptr<PrototypeAST> log_error_proto(const char *str) {
-  return log_error_proto(str);
+  log_error(str);
+  return nullptr;
 }
