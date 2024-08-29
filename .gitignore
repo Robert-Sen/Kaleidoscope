@@ -3,4 +3,4 @@
 .vscode
 build
 CMakeFiles
-cmake-build-debug
+cmake-*

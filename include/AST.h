@@ -1,6 +1,8 @@
 #ifndef AST_H
 #define AST_H
 
+#include <llvm/IR/Function.h>
+#include <llvm/IR/Value.h>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -10,7 +12,9 @@ class ExprAST {
 
 public:
   // ExprAST() = default;
-  ~ExprAST() = default;
+  virtual ~ExprAST() = default;
+
+  virtual llvm::Value *gen_ir() = 0;
 };
 
 ///////////////////////////////////////////////////////////
@@ -23,6 +27,8 @@ class NumberExprAST : public ExprAST {
 
 public:
   explicit NumberExprAST(double val) : val_(val) {}
+
+  llvm::Value *gen_ir() override;
 };
 
 // VariableExprAST
@@ -31,6 +37,8 @@ class VariableExprAST : public ExprAST {
 
 public:
   explicit VariableExprAST(std::string_view name) : name_(name) {}
+
+  llvm::Value *gen_ir() override;
 };
 
 // BinaryExprAST
@@ -42,16 +50,21 @@ public:
   BinaryExprAST(int op, std::unique_ptr<ExprAST> lhs,
                 std::unique_ptr<ExprAST> rhs)
       : op_(op), lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
+
+  llvm::Value *gen_ir() override;
 };
 
 // CallExprAST
 class CallExprAST : public ExprAST {
-  std::string name_;
+  std::string callee_;
   std::vector<std::unique_ptr<ExprAST>> args_;
 
 public:
-  CallExprAST(std::string_view name, std::vector<std::unique_ptr<ExprAST>> args)
-      : name_(name), args_(std::move(args)) {}
+  CallExprAST(std::string_view callee,
+              std::vector<std::unique_ptr<ExprAST>> args)
+      : callee_(callee), args_(std::move(args)) {}
+
+  llvm::Value *gen_ir() override;
 };
 
 ///////////////////////////////////////////////////////////
@@ -66,6 +79,10 @@ class PrototypeAST : public ExprAST {
 public:
   PrototypeAST(std::string_view name, std::vector<std::string> args)
       : name_(name), args_(std::move(args)) {}
+
+  std::string_view get_name() { return name_; }
+
+  llvm::Function *gen_ir() override;
 };
 
 class FunctionAST : public ExprAST {
@@ -76,6 +93,8 @@ public:
   FunctionAST(std::unique_ptr<PrototypeAST> proto,
               std::unique_ptr<ExprAST> body)
       : proto_(std::move(proto)), body_(std::move(body)) {}
+
+  llvm::Function *gen_ir() override;
 };
 
 #endif

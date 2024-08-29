@@ -7,9 +7,11 @@ int main() {
   Parser parser;
 
   parser.lexer_.add_op('>', 10);
+  parser.lexer_.add_op('<', 10);
   parser.lexer_.add_op('+', 20);
   parser.lexer_.add_op('-', 20);
   parser.lexer_.add_op('*', 40);
+  parser.lexer_.add_op('/', 40);
 
   std::cout << "ready> ";
   parser.lexer_.get_next_tok();

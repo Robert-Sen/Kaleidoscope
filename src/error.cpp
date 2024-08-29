@@ -12,3 +12,8 @@ std::unique_ptr<PrototypeAST> log_error_proto(const char *str) {
   log_error(str);
   return nullptr;
 }
+
+llvm::Value *log_error_value(const char *str) {
+  std::cerr << str << '\n';
+  return nullptr;
+}

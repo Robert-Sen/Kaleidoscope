@@ -3,6 +3,7 @@
 #include "lexer.h"
 
 #include <error.h>
+#include <llvm/Support/raw_ostream.h>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -131,7 +132,7 @@ std::unique_ptr<ExprAST> Parser::parse_binop_rhs(int prec,
 
     // Case: lhs cur_op (rhs next_op unparsed)
     if (cur_prec < next_prec) {
-      rhs = this->parse_binop_rhs(cur_prec + 1, std::move(lhs));
+      rhs = this->parse_binop_rhs(cur_prec + 1, std::move(rhs));
       if (!rhs) {
         return nullptr;
       }
@@ -161,7 +162,8 @@ std::unique_ptr<PrototypeAST> Parser::parse_prototype() {
 
   std::vector<std::string> args;
   while (this->lexer_.get_next_tok() == TOK_IDENTIFIER) {
-    args.push_back(std::string(this->lexer_.get_tok_value<std::string_view>()));
+    args.emplace_back(
+        std::string(this->lexer_.get_tok_value<std::string_view>()));
   }
   if (this->lexer_.get_cur_tok() != ')') {
     return log_error_proto("expected ')' in prototype");
@@ -204,8 +206,12 @@ std::unique_ptr<FunctionAST> Parser::parse_top_level_expr() {
 ///////////////////////////////////////////////////////////
 
 void Parser::handle_definition() {
-  if (this->parse_definition()) {
-    std::cout << "Parsed a function definition\n";
+  if (auto fn_ast = this->parse_definition()) {
+    if (auto *fn_ir = fn_ast->gen_ir()) {
+      std::cout << "Read function definition:\n";
+      fn_ir->print(llvm::outs());
+      std::cout << "\n";
+    }
   } else {
     // Skip token for error recovery
     this->lexer_.get_next_tok();
@@ -213,8 +219,12 @@ void Parser::handle_definition() {
 }
 
 void Parser::handle_extern() {
-  if (this->parse_extern()) {
-    std::cout << "Parsed a extern function\n";
+  if (auto proto_ast = this->parse_extern()) {
+    if (auto *fn_ir = proto_ast->gen_ir()) {
+      std::cout << "Read extern:\n";
+      fn_ir->print(llvm::outs());
+      std::cout << "\n";
+    }
   } else {
     // Skip token for error recovery
     this->lexer_.get_next_tok();
@@ -222,8 +232,12 @@ void Parser::handle_extern() {
 }
 
 void Parser::handle_top_level_expresion() {
-  if (parse_top_level_expr()) {
-    std::cout << "Parsed a top level expression\n";
+  if (auto fn_ast = parse_top_level_expr()) {
+    if (auto *fn_ir = fn_ast->gen_ir()) {
+      std::cout << "Read top level expression:\n";
+      fn_ir->print(llvm::outs());
+      std::cout << "\n";
+    }
   } else {
     // Skip token for error recovery
     this->lexer_.get_next_tok();
